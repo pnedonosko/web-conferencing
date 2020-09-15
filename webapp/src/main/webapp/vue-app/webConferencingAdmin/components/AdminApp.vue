@@ -28,9 +28,9 @@
                     style="width: 5%">{{ $t("webconferencing.admin.table.Permissions") }}</th>
                 </tr>
               </thead>
-              <tbody v-if="attachmentsComposerActions.length > 0">
+              <tbody v-if="attachmentsProviderPreferences.length > 0">
                 <tr 
-                  v-for="action in attachmentsComposerActions" 
+                  v-for="action in attachmentsProviderPreferences" 
                   :key="action.component.name"
                   class="providersTableRow">
                   <td>
@@ -74,7 +74,7 @@
       </v-row>
     </v-container>
     <div 
-      v-for="action in attachmentsComposerActions" 
+      v-for="action in attachmentsProviderPreferences" 
       :key="action.key"
       :class="`${action.appClass}Action`">
       <component 
@@ -90,8 +90,8 @@
 <script>
 import { postData, getData } from "../AdminAPI";
 // import Jitsi from "../../../../../../../../jitsi/webapp/src/main/webapp/vue-app/Jitsi/components/Jitsi.vue";
-// import WebRTC from "../../../../../../../webrtc/webapp/src/main/webapp/vue-app/webrtc/components/WebRTC.vue";
-import { getAttachmentsComposerExtensions } from "../../../js/extension";
+// import WebRTC from "../../../../../../../webrtc/web  app/src/main/webapp/vue-app/webrtc/components/WebRTC.vue";
+import { getAttachmentsProvidersSettings } from "../../../js/extension";
 
 export default {
   components: {
@@ -125,7 +125,7 @@ export default {
   },
   created() {
     this.getProviders();
-    this.attachmentsComposerActions = getAttachmentsComposerExtensions();
+    this.attachmentsProviderPreferences = getAttachmentsProvidersSettings();
   },
   methods: {
     async getProviders() {

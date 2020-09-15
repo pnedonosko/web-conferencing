@@ -1,7 +1,8 @@
 import adminApp from "./components/AdminApp.vue";
-
+import WebRTC from "../../../../../../webrtc/webapp/src/main/webapp/vue-app/WebRTC/components/WebRTC.vue"
 
 Vue.use(Vuetify);
+Vue.component("WebRTC", WebRTC)
 const vuetify = new Vuetify({
   dark: true,
   iconfont: ""

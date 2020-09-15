@@ -1,12 +1,12 @@
-let attachmentsComposerActions = null;
+let attachmentsProviderPreferences = null;
 
-export function getAttachmentsComposerExtensions() {
-  if(attachmentsComposerActions == null) {
+export function getAttachmentsProvidersSettings() {
+  if(attachmentsProviderPreferences == null) {
     const allExtensions = extensionRegistry.loadExtensions("webConferencing", "webconferencing")
-    attachmentsComposerActions = allExtensions.filter(extension => isExtensionEnabled(extension));
+    attachmentsProviderPreferences = allExtensions.filter(extension => isExtensionEnabled(extension));
   }
 
-  return attachmentsComposerActions;
+  return attachmentsProviderPreferences;
 }
 
 function isExtensionEnabled(extension) {

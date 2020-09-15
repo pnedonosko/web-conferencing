@@ -1,6 +1,6 @@
 import WebRTC from "./components/WebRTC.vue";
-
 Vue.use(Vuetify);
+Vue.component("WebRTC", WebRTC)
 const vuetify = new Vuetify({
   dark: true,
   iconfont: ""

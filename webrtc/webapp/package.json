@@ -1,7 +1,7 @@
 {
-  "name": "web-conferencing",
+  "name": "webrtc",
   "version": "1.0.0",
-  "description": "eXo Web conferencing webapp",
+  "description": "eXo Web conferencing plugin",
   "repository": {
     "type": "git",
     "url": "https://github.com/exoplatform/webconferencing"

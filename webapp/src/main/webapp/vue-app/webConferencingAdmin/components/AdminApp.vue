@@ -28,37 +28,39 @@
                     style="width: 5%">{{ $t("webconferencing.admin.table.Permissions") }}</th>
                 </tr>
               </thead>
-              <tbody v-if="providers.length > 0">
+              <tbody v-if="attachmentsComposerActions.length > 0">
                 <tr 
-                  v-for="item in providers" 
-                  :key="item.title"
+                  v-for="action in attachmentsComposerActions" 
+                  :key="action.component.name"
                   class="providersTableRow">
                   <td>
                     <div>
-                      {{ i18n.te(`webconferencing.admin.${item.title}.name`)
-                        ? $t(`webconferencing.admin.${item.title}.name`)
-                        : item.title
+                      {{ i18n.te(`webconferencing.admin.${action.component.name}.name`)
+                        ? $t(`webconferencing.admin.${action.component.name}.name`)
+                        : action.component.name
                       }}
                     </div>
                   </td>
                   <td>
                     <div 
-                      v-html="i18n.te(`webconferencing.admin.${item.title}.description`)
-                        ? $t(`webconferencing.admin.${item.title}.description`)
+                      v-html="i18n.te(`webconferencing.admin.${action.component.name}.description`)
+                        ? $t(`webconferencing.admin.${action.component.name}.description`)
                       : '' ">
                     </div>
                   </td>
                   <td class="center actionContainer">
                     <div>
                       <v-switch
+                        v-for="provider in getFilteredProviders(providers, action.component)"
+                        :key="provider.title"
                         :dense="true"
-                        :input-value="item.active"
+                        :input-value="provider.active"
                         :ripple="false"
-                        v-model="item.active"
+                        v-model="provider.active"
                         hide-details
                         color="#568dc9"
                         class="providersSwitcher"
-                        @change="changeActive(item)"/>
+                        @change="changeActive(action.component, provider)"/>
                     </div>
                   </td>
                   <td class="center actionContainer">
@@ -71,14 +73,30 @@
         </v-col>
       </v-row>
     </v-container>
+    <div 
+      v-for="action in attachmentsComposerActions" 
+      :key="action.key"
+      :class="`${action.appClass}Action`">
+      <component 
+        v-dynamic-events="action.component.events"
+        v-if="action.component"
+        v-bind="action.component.props ? action.component.props : {}"
+        :is="action.component.name"
+        :ref="action.key" />
+    </div>
   </v-app>
 </template>
 
 <script>
 import { postData, getData } from "../AdminAPI";
+// import Jitsi from "../../../../../../../../jitsi/webapp/src/main/webapp/vue-app/Jitsi/components/Jitsi.vue";
+// import WebRTC from "../../../../../../../webrtc/webapp/src/main/webapp/vue-app/webrtc/components/WebRTC.vue";
+import { getAttachmentsComposerExtensions } from "../../../js/extension";
 
 export default {
   components: {
+    // Jitsi,
+    // WebRTC
   },
   props: {
     services: {
@@ -107,39 +125,33 @@ export default {
   },
   created() {
     this.getProviders();
-    console.log(webConferencing);
+    this.attachmentsComposerActions = getAttachmentsComposerExtensions();
   },
   methods: {
     async getProviders() {
+      console.log(extensionRegistry.loadExtensions("webConferencing", "webconferencing"), "extensionApp")
       console.log(webConferencing, "webconf");
       // services object contains urls for requests
       try {
-        // const data = await getData(this.services.providers);
-        const response = await webConferencing.getProvidersConfig();
-        console.log(response, "response");
-        const data = webConferencing.getProvidersConfig().done(response);
+        this.providers = await webConferencing.getProvidersConfig();
         this.error = null;
-        this.providers = await response;
         console.log(this.providers, "providers");
-        // const resourcesPromises = this.providers.map(({ provider }) => this.getProviderResources(provider));
-        // Promise.all(resourcesPromises).then(res => {
-        //   res.map(localized => {
-        //     this.i18n.mergeLocaleMessage(this.language, localized.getLocaleMessage(this.language));
-        //   });
-        // });
       } catch (err) {
         this.error = err.message;
       }
+    },
+    getFilteredProviders(providers, plugin) {
+      return providers.filter(provider => provider.title === plugin.name)
     },
     getProviderResources(providerId) {
       const resourceUrl = `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.${providerId}.${this.resourceBundleName}-${this.language}.json`;
       return exoi18n.loadLanguageAsync(this.language, resourceUrl);
     },
-    async changeActive(provider) {
+    async changeActive(plugin, provider) {
       // getting rest for updating provider status
       try {
-        const data = await webConferencing.postProviderConfig(provider.type, provider.active)
-        console.log(provider.active, "checked", provider.title);
+        const data = await webConferencing.postProviderConfig(plugin.name.toLowerCase(), provider.active)
+        console.log(provider.active, "checked", plugin.name);
         this.error = null;
       } catch (err) {
         this.error = err.message;

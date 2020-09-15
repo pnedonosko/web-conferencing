@@ -23,6 +23,12 @@
   xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_resources_1_3 http://www.gatein.org/xml/ns/gatein_resources_1_3"
   xmlns="http://www.gatein.org/xml/ns/gatein_resources_1_3">
 
+  <javascript>
+    <param>
+      <js-module>WebRTCPlugin</js-module>
+      <js-path>/js/WebRTCPlugin.js</js-path>
+    </param>
+  </javascript>
   <!-- CSS for WebRTC support in Platform -->
   
   <!-- CSS tweaks for Enterprise skin -->
@@ -54,6 +60,9 @@
     <depends>
       <module>webConferencing</module>
     </depends>
+    <depends>
+      <module>extensionRegistry</module>
+    </depends>
     <!-- depends>
       <module>webrtcAdapter</module>
     </depends -->
@@ -70,4 +79,25 @@
       </depends>
     </module>
   </portlet -->
+  <module>
+    <name>WebRTC</name>
+    <script>
+      <path>/js/WebRTC.bundle.js</path>
+    </script>
+    <depends>
+      <module>webConferencing</module>
+    </depends>
+    <depends>
+      <module>vue</module>
+    </depends>
+    <depends>
+      <module>vuetify</module>
+    </depends>
+    <depends>
+      <module>eXoVueI18n</module>
+    </depends>
+    <depends>
+      <module>extensionRegistry</module>
+    </depends>
+  </module>
 </gatein-resources>

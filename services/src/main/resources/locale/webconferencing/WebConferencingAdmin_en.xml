@@ -24,6 +24,35 @@
       <WebRTC>
         <name>WebRTC</name>
         <description>Default provider based on <![CDATA[<a href="https://webrtc.org/" target="_blank">WebRTC</a>]]> standard. Let users to place peer to peer call. No browser plugin needed.</description>
+        <modal>
+          <title>WebRTC settings</title>
+          <StunNurnServ>STUN / TURN servers </StunNurnServ>
+          <warn>STUN/TURN servers are required to ensure that web conferencing calls  will work properly across network routers. We highly recommend setting up your own private TURN server to keep control on the security of your communications and ensure maximum availability.</warn>
+          <URL>URL:</URL>
+          <Credentials>Credentials</Credentials>
+          <input>
+            <username>
+              <label>Username</label>
+              <placeholder>Username...</placeholder>
+            </username>
+            <credential>
+              <label>Credential</label>
+              <placeholder>Credential...</placeholder>
+            </credential>
+          </input>
+          <ErrDiagnostocs>Error Diagnostocs</ErrDiagnostocs>
+          <CsLog>Enable client-side log collection</CsLog>
+          <tooltips>
+            <infoStun>STUN/TURN servers are required to ensure that web conferencing calls  will work properly across network routers. We highly recommend setting up your own private TURN server to keep control on the security of your communications and ensure maximum availability.</infoStun>
+            <infoCsLog>This flag will log information from client in the server logs in order to troubleshoot WebRTC connectivity issue. Use carefully, this mode is verbose and may cause significant network overhead.</infoCsLog>
+            <add>Add a new server</add>
+            <remove>Remove server</remove>
+          </tooltips>
+          <removeModal>
+            <title>Remove ICE Server?</title>
+            <confirmAction>Are you sure you want to remove this server configuration?</confirmAction>
+          </removeModal>
+        </modal>
       </WebRTC>
       <Skype>
         <name>Skype</name>
@@ -36,11 +65,12 @@
       <modal>
         <title>Provider settings</title>
         <SearchLabel>URL :</SearchLabel>
-        <WithPermissions>STUN / TURN servers </WithPermissions>
+        <StunNurnServ>STUN / TURN servers </StunNurnServ>
         <None>None</None>
         <Everybody>Everybody</Everybody>
       </modal>
       <buttons>
+        <Remove>Remove</Remove>
         <Save>Save</Save>
         <Cancel>Cancel</Cancel>
       </buttons>

@@ -7,14 +7,12 @@
         class="alert alert-error">{{ i18n.te(`${errorResourceBase}.${error}`) ? $t(`${errorResourceBase}.${error}`) : error }}</div>
       <v-row class="white">
         <v-col xs12 px-3>
-          <h4 class="webconferencingTitle">{{ $t("webconferencing.admin.title") }}</h4>
+          <v-title class="webconferencingTitle">{{ $t("webconferencing.admin.title") }}</v-title>
         </v-col>
       </v-row>
       <v-row>
         <v-col xs12>
-          <v-simple-table
-            :dense="true"
-            class="uiGrid table table-hover providersTable">
+          <v-simple-table :dense="true" class="uiGrid table table-hover providersTable">
             <template v-slot:default>
               <thead>
                 <tr class="providersTableRow">
@@ -29,8 +27,8 @@
                 </tr>
               </thead>
               <tbody v-if="attachmentsProviderPreferences.length > 0">
-                <tr 
-                  v-for="action in attachmentsProviderPreferences" 
+                <tr
+                  v-for="action in attachmentsProviderPreferences"
                   :key="action.component.name"
                   class="providersTableRow">
                   <td>
@@ -42,11 +40,10 @@
                     </div>
                   </td>
                   <td>
-                    <div 
+                    <div
                       v-html="i18n.te(`webconferencing.admin.${action.component.name}.description`)
                         ? $t(`webconferencing.admin.${action.component.name}.description`)
-                      : '' ">
-                    </div>
+                      : '' "></div>
                   </td>
                   <td class="center actionContainer">
                     <div>
@@ -60,11 +57,19 @@
                         hide-details
                         color="#568dc9"
                         class="providersSwitcher"
-                        @change="changeActive(action.component, provider)"/>
+                        @change="changeActive(action.component, provider)" />
                     </div>
                   </td>
                   <td class="center actionContainer">
-                    <i class="uiIconSetting uiIconLightGray"></i>
+                    <div :key="action.key" :class="`${action.appClass}Action`">
+                      <component
+                        v-dynamic-events="action.component.events"
+                        v-if="action.component"
+                        :action="action"
+                        v-bind="action.component.props ? action.component.props : {}"
+                        :is="action.component.name"
+                        :ref="action.key"/>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -73,30 +78,17 @@
         </v-col>
       </v-row>
     </v-container>
-    <div 
-      v-for="action in attachmentsProviderPreferences" 
-      :key="action.key"
-      :class="`${action.appClass}Action`">
-      <component 
-        v-dynamic-events="action.component.events"
-        v-if="action.component"
-        v-bind="action.component.props ? action.component.props : {}"
-        :is="action.component.name"
-        :ref="action.key" />
-    </div>
   </v-app>
 </template>
 
 <script>
 import { postData, getData } from "../AdminAPI";
 // import Jitsi from "../../../../../../../../jitsi/webapp/src/main/webapp/vue-app/Jitsi/components/Jitsi.vue";
-// import WebRTC from "../../../../../../../webrtc/web  app/src/main/webapp/vue-app/webrtc/components/WebRTC.vue";
 import { getAttachmentsProvidersSettings } from "../../../js/extension";
 
 export default {
   components: {
     // Jitsi,
-    // WebRTC
   },
   props: {
     services: {
@@ -129,8 +121,10 @@ export default {
   },
   methods: {
     async getProviders() {
-      console.log(extensionRegistry.loadExtensions("webConferencing", "webconferencing"), "extensionApp")
-      console.log(webConferencing, "webconf");
+      console.log(
+        extensionRegistry.loadExtensions("webConferencing", "webconferencing"),
+        "extensionApp"
+      );
       // services object contains urls for requests
       try {
         this.providers = await webConferencing.getProvidersConfig();
@@ -141,7 +135,7 @@ export default {
       }
     },
     getFilteredProviders(providers, plugin) {
-      return providers.filter(provider => provider.title === plugin.name)
+      return providers.filter(provider => provider.title === plugin.name);
     },
     getProviderResources(providerId) {
       const resourceUrl = `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.${providerId}.${this.resourceBundleName}-${this.language}.json`;
@@ -150,8 +144,10 @@ export default {
     async changeActive(plugin, provider) {
       // getting rest for updating provider status
       try {
-        const data = await webConferencing.postProviderConfig(plugin.name.toLowerCase(), provider.active)
-        console.log(provider.active, "checked", plugin.name);
+        const data = await webConferencing.postProviderConfig(
+          plugin.name.toLowerCase(),
+          provider.active
+        );
         this.error = null;
       } catch (err) {
         this.error = err.message;
@@ -162,8 +158,8 @@ export default {
 </script>
 
 <style scoped lang="less">
-  #web-conferencing-admin {
-    .webconferencingTitle {
+#web-conferencing-admin {
+  .webconferencingTitle {
     color: #4d5466;
     font-size: 24px;
     position: relative;
@@ -179,24 +175,26 @@ export default {
       margin-left: 10px;
     }
   }
-    .providersTable {
+  .providersTable {
     border-left: 0;
-      .providersTableRow {
-        th,
-        td {
-          height: 20px;
-          padding: 5px 15px;
-        }
+    .providersTableRow {
+      th,
+      td {
+        height: 20px;
+        padding: 5px 15px;
       }
     }
-      .providersSwitcher {
-      padding: 0;
-      margin: 0;
-      height: 25px;
-    }
-    .uiIconSetting::before{
-      content: "\f13e";
-      font-size: 21px;
-    }
   }
+  .providersSwitcher {
+    padding: 0;
+    margin: 0;
+    height: 25px;
+  }
+}
+</style>
+<style>
+.uiIconSetting::before {
+  content: "\f13e";
+  font-size: 21px;
+}
 </style>

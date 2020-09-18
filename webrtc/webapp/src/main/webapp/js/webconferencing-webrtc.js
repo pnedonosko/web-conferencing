@@ -101,7 +101,7 @@
 				});
 				return webConferencing.initRequest(request);
 			};
-			
+			this.postSettings = postSettings;
 			var callLink = function(callId) {
 				return settings.callUri + "/" + callId;
 			}

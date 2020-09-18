@@ -1,10 +1,27 @@
 import WebRTC from "./components/WebRTC.vue";
+import Server from "./components/Server.vue";
+import NoServer from "./components/Noserver.vue";
+import RemoveServer from "./components/RemoveIceServer.vue";
+// import Vuex from "vuex";
+
+// Vue.use(Vuex);
 Vue.use(Vuetify);
-Vue.component("WebRTC", WebRTC)
+Vue.component("Server", Server);
+Vue.component("RemoveServer", RemoveServer);
+Vue.component("NoServer", NoServer);
+Vue.component("WebRTC", WebRTC);
+
 const vuetify = new Vuetify({
   dark: true,
   iconfont: ""
 });
+
+// const store = new Vuex.Store({
+//   state: {
+//   },
+//   mutations: {
+//   }
+// })
 
 // getting language of user
 const lang = (eXo && eXo.env && eXo.env.portal && eXo.env.portal.language) || "en";

@@ -26,7 +26,7 @@
         <description>Default provider based on <![CDATA[<a href="https://webrtc.org/" target="_blank">WebRTC</a>]]> standard. Let users to place peer to peer call. No browser plugin needed.</description>
         <modal>
           <title>WebRTC settings</title>
-          <StunNurnServ>STUN / TURN servers </StunNurnServ>
+          <StunTurnServ>STUN / TURN servers </StunTurnServ>
           <warn>STUN/TURN servers are required to ensure that web conferencing calls  will work properly across network routers. We highly recommend setting up your own private TURN server to keep control on the security of your communications and ensure maximum availability.</warn>
           <URL>URL:</URL>
           <Credentials>Credentials</Credentials>
@@ -65,7 +65,7 @@
       <modal>
         <title>Provider settings</title>
         <SearchLabel>URL :</SearchLabel>
-        <StunNurnServ>STUN / TURN servers </StunNurnServ>
+        <StunTurnServ>STUN / TURN servers </StunTurnServ>
         <None>None</None>
         <Everybody>Everybody</Everybody>
       </modal>

@@ -27,10 +27,7 @@
                 </tr>
               </thead>
               <tbody v-if="attachmentsProviderPreferences.length > 0">
-                <tr
-                  v-for="action in attachmentsProviderPreferences"
-                  :key="action.component.name"
-                  class="providersTableRow">
+                <tr v-for="action in attachmentsProviderPreferences" :key="action.component.name" class="providersTableRow">
                   <td>
                     <div>
                       {{ i18n.te(`webconferencing.admin.${action.component.name}.name`)

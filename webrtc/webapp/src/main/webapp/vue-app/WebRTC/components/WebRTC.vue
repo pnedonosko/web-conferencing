@@ -21,8 +21,9 @@
         <div v-show="error" class="alert alert-error">{{ $t(error) }}</div>
         <v-card-title class="popupHeader ClearFix">
           <span
-            class="PopupTitle popupTitle"
-          >{{ this.$t(`webconferencing.admin.${action.component.name}.modal.title`) }}</span>
+            class="PopupTitle popupTitle">
+            {{ this.$t(`webconferencing.admin.${action.component.name}.modal.title`) }}
+          </span>
           <i class="uiIconClose pull-right" @click="closeDialog"></i>
         </v-card-title>
         <div v-show="warn" class="alert alert-warning no-server-warning">{{ $t(warn) }}</div>
@@ -30,7 +31,7 @@
           <v-container class="permissions px-0">
             <v-row>
               <v-card-subtitle style="font-weight: bold">
-                {{ $t(`webconferencing.admin.${action.component.name}.modal.StunNurnServ`) }}
+                {{ $t(`webconferencing.admin.${action.component.name}.modal.StunTurnServ`) }}
                 <v-tooltip top max-width="500">
                   <template v-slot:activator="{ on, attr }">
                     <i 
@@ -136,6 +137,15 @@ export default {
         this.error = err.message;
       }
     },
+
+   /**
+   * Post the settings configuration and close settings dialog
+   *
+   * @async
+   * @function postSettingsConfig
+   * @return {Promise<JSON>} 
+   */
+
     async postSettingsConfig() {
       try {
         await webConferencing.webrtc.postSettings({
@@ -146,14 +156,29 @@ export default {
       }
       this.closeDialog();
     },
+
+    /**
+     * Close settings dialog
+     *
+     * @function closeDialog
+     */
+
     closeDialog() {
       this.error = null;
       this.showDialog = false;
     },
-    addServer(e, newSettings) {
+
+    /**
+     * Add new iceServer to this.settings.iceServers and 
+     * depends on it Server component renders it to the DOM
+     *
+     * @function addServer
+     * @param {Object} e - the event to work with
+     */
+
+    addServer(e) {
       if (e.target.matches(".actionIcon, .uiIconPlus")) {
-        console.log("Got a click on plus");
-        const newserverset = {
+        const newServerSettings = {
           credential: "",
           default: true,
           enabled: true,
@@ -162,16 +187,24 @@ export default {
         };
         if (this.components.indexOf(NoServer) !== -1) {
           this.components.pop(NoServer);
-          // this.settings.iceServers = this.settings.iceServers;
-          // this.credentialsCheck = this.credentialsCheck;
           this.components.push(Server)
           this.warn = null;
         } else {
-          this.settings.iceServers = [...this.settings.iceServers, newserverset];
+          this.settings.iceServers = [...this.settings.iceServers, newServerSettings];
         this.credentialsCheck = [...this.credentialsCheck, false];
         }
       }
     },
+
+     /**
+     * Remove the iceServer from this.settings.iceServers depending on event.taget 
+     * and depends on it Server component renders to the DOM
+     * and close confirmation dialog
+     *
+     * @function removeServer
+     * @param {Object} e - the event to work with
+     */
+
     removeServer(e) {
       const classn = e.target.getAttribute("class");
       this.settings.iceServers.map((iceServer, index, arr) => {

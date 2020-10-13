@@ -2338,14 +2338,27 @@
 				})
 			}).fail((err, status) => {
 				result.reject(err, status);
-			})
+			});
 			return result.promise();
-		}
-		
+		};
+
+		var clearCallContextInitalizer = function() {
+			if (callContextInitializer.state() === "resolved" || callContextInitializer.state() === "rejected") {
+				callContextInitializer = $.Deferred();
+			}
+		};
+
 		this.initChatContext = async function(chat) {
 			const context = await createChatContext(chat);
 			callContextInitializer.resolve(context);
-		}
+		};
+
+		this.initSpaceContext = function(spaceId, userId) {
+			clearCallContextInitalizer();
+			currentUser = getUserInfoReq(userId);
+			const context = spaceContext(spaceId);
+			callContextInitializer.resolve(context);
+		};
 	}
 	
 	var webConferencing = new WebConferencing();

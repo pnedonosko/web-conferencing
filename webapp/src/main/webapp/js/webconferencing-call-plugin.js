@@ -9,7 +9,7 @@ const WebConferencingCallPlugin = [{
   // \Call\components\CallButtons.vue with
   // exo-addons\chat-application\application\src\main\webapp\vue-app\components\ExoChatRoomDetail.vue and connects them
   // key should be unique and used in parent component as a ref to WebConferencingCall component
-  key : "callButton",
+  key : "chatCallButton",
   rank : 20,
   // iconName is a name of the icon which is displayed on action button with 'onExecute' action
   // iconName should be one of the names, supported by vuetify 'v-icon' component (https://vuetifyjs.com/en/components/icons/)
@@ -29,7 +29,9 @@ const WebConferencingCallPlugin = [{
   init : function (chat) {
     require(["SHARED/webConferencing", "SHARED/webConferencingCallButton"], function (webConferencing, webConferencingCallButton) {
       webConferencing.initChatContext(chat);
-      var settings = {};
+      var settings = {
+        targetExtensionPoint: "chat"
+      };
       webConferencingCallButton.init(settings);
     });
   },
@@ -42,7 +44,7 @@ const WebConferencingCallPlugin = [{
   // \Call\components\CallButtons.vue with
   // exo-addons\chat-application\application\src\main\webapp\vue-app\components\modal\ExoChatDrawer.vue and connects them
   // key should be unique and used in parent component as a ref to WebConferencingCall component
-  key : "callButton",
+  key : "miniChatCallButton",
   rank : 20,
   // iconName is a name of the icon which is displayed on action button with 'onExecute' action
   // iconName should be one of the names, supported by vuetify 'v-icon' component (https://vuetifyjs.com/en/components/icons/)
@@ -61,22 +63,26 @@ const WebConferencingCallPlugin = [{
   // init call button context in mini chat
   init : function (chat) {
     require(["SHARED/webConferencing", "SHARED/webConferencingCallButton"], function (webConferencing, webConferencingCallButton) {
-      webConferencing.initChatContext(chat);
-      var settings = {};
-      webConferencingCallButton.init(settings);
+      if (!(eXo.env.portal.selectedNodeUri === 'chat')) { // don't init in chat
+        webConferencing.initChatContext(chat);
+        var settings = {
+          targetExtensionPoint : "mini-chat"
+        };
+        webConferencingCallButton.init(settings);
+      }
     });
   },
   // enabled just show that this extension is enabled, if enabled: false WebConferencingCallComponent will not appear on page
   enabled : true
 }, {
   target : "space-menu",
-  type : "room-action-component",
+  type : "action-component",
   // configuration defined here is used in exo-addons\web-conferencing\webapp\src\main\webapp\vue-apps
   // \Call\components\CallButtons.vue with
-  // exo-addons\chat-application\application\src\main\webapp\vue-app\components\ExoChatRoomDetail.vue and connects them
+  // social\webapp\portlet\src\main\webapp\space-menu\components\SpaceMenu.vue and connects them
   // key should be unique and used in parent component as a ref to WebConferencingCall component
-  key : "callButton",
-  rank : 21,
+  key : "spaceCallButton",
+  rank : 20,
   // iconName is a name of the icon which is displayed on action button with 'onExecute' action
   // iconName should be one of the names, supported by vuetify 'v-icon' component (https://vuetifyjs.com/en/components/icons/)
   // if it should be custom icon that isn't supported by vuetify iconClass instead of iconName should be used
@@ -90,6 +96,16 @@ const WebConferencingCallPlugin = [{
     name : "call-component",
     // events are passed to custom DynamicEvents directive (https://vuejs.org/v2/guide/custom-directive.html)
     events : []
+  },
+  // init call button context in space
+  init : function (spaceId, userId) {
+    require(["SHARED/webConferencing", "SHARED/webConferencingCallButton"], function (webConferencing, webConferencingCallButton) {
+      webConferencing.initSpaceContext(spaceId, userId);
+      var settings = {
+        targetExtensionPoint : "space"
+      };
+      webConferencingCallButton.init(settings);
+    });
   },
   // enabled just show that this extension is enabled, if enabled: false WebConferencingCallComponent will not appear on page
   enabled : true
@@ -139,4 +155,7 @@ require(["SHARED/extensionRegistry", "SHARED/webConferencing"], function (extens
 
   // dispatch the event about adding an extension in the mini chat
   document.dispatchEvent(new CustomEvent("mini-chat-title-action-components-updated"));
+
+  // dispatch the event about adding an extension in the space menu
+  document.dispatchEvent(new CustomEvent("space-menu-action-components-updated"));
 });

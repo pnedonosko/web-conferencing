@@ -30,7 +30,8 @@ const WebConferencingCallPlugin = [{
     require(["SHARED/webConferencing", "SHARED/webConferencingCallButton"], function (webConferencing, webConferencingCallButton) {
       webConferencing.initChatContext(chat);
       var settings = {
-        targetExtensionPoint: "chat"
+        targetExtensionPoint: "chat",
+        key : "chatCallButton"
       };
       webConferencingCallButton.init(settings);
     });
@@ -64,11 +65,14 @@ const WebConferencingCallPlugin = [{
   init : function (chat) {
     require(["SHARED/webConferencing", "SHARED/webConferencingCallButton"], function (webConferencing, webConferencingCallButton) {
       if (!(eXo.env.portal.selectedNodeUri === 'chat')) { // don't init in chat
-        webConferencing.initChatContext(chat);
-        var settings = {
-          targetExtensionPoint : "mini-chat"
-        };
-        webConferencingCallButton.init(settings);
+        webConferencing.getContextInitializer().then(() => {
+          webConferencing.initChatContext(chat);
+          var settings = {
+            targetExtensionPoint : "mini-chat",
+            key : "miniChatCallButton"
+          };
+          webConferencingCallButton.init(settings);
+        });
       }
     });
   },
@@ -100,11 +104,14 @@ const WebConferencingCallPlugin = [{
   // init call button context in space
   init : function (spaceId, userId) {
     require(["SHARED/webConferencing", "SHARED/webConferencingCallButton"], function (webConferencing, webConferencingCallButton) {
-      webConferencing.initSpaceContext(spaceId, userId);
-      var settings = {
-        targetExtensionPoint : "space"
-      };
-      webConferencingCallButton.init(settings);
+      webConferencing.getContextInitializer().then((value) => {
+        webConferencing.initSpaceContext(spaceId, userId);
+        var settings = {
+          targetExtensionPoint : "space",
+          key : "spaceCallButton"
+        };
+        webConferencingCallButton.init(settings);
+      });
     });
   },
   // enabled just show that this extension is enabled, if enabled: false WebConferencingCallComponent will not appear on page

@@ -42,7 +42,7 @@ export default {
       required: true
     }
   },
-  data() {
+  data: function () {
     return {
       callContext: null,
       localCallContext: null, // the context from events
@@ -52,14 +52,20 @@ export default {
       placeholder: "Start call",
       isOpen: false,
       childRef: null,
-      providersTypes: []
+      providersTypes: [],
+      target: null,
+      contextCreation: null
     };
   },
-  created() {
+  async created() {
+    this.target = this.$props.targetExtensionPoint;
     this.log = webConferencing.getLog("webconferencing-call-buttons");
     this.log.trace(`targetExtensionPoint: ${this.targetExtensionPoint}`);
 
-    switch (this.targetExtensionPoint) {
+    this.contextCreation = this.initContext();
+    await this.contextCreation;
+
+    switch (this.target) {
       case "mini-chat":
         this.log.trace("Mini-chat mounting preparation");
         this.initMiniChatContactHandler();
@@ -75,21 +81,21 @@ export default {
   async beforeMount() {
     const thevue = this;
     this.log.trace(`targetExtensionPoint mount: ${this.$props.targetExtensionPoint}`);
+    this.log.trace(`target: ${this.target}`);
 
-    switch (this.targetExtensionPoint) {
+    await this.contextCreation;
+
+    switch (this.target) {
       case "chat":
         this.log.trace("Chat mounting preparation");
-        await this.initContext();
         this.initButtons(this.callContext);
         break;
       case "space":
         this.log.trace("Space mounting preparation");
-        await this.initContext();
         this.initButtons(this.callContext);
         break;
       case "user-profile":
         this.log.trace("User profile mounting preparation");
-        await this.initContext();
         this.initButtons(this.callContext);
         break;
     }
@@ -100,6 +106,7 @@ export default {
 
       try {
         const response = await webConferencing.getProvidersConfig();
+        this.cleanProvidersTypes();
         this.providersTypes = response.map(provider => provider.type);
         const context = await webConferencing.getCallContext();
         thevue.callContext = context;
@@ -109,21 +116,29 @@ export default {
       }
     },
     async initButtons(context) {
+      this.log.trace(`initButtons context: ${JSON.stringify(context)}`);
       if (context) {
+        this.cleanProviders();
+        this.cleanProvidersButtons();
+
         try {
           // const p = await webConferencing.getProvider("jitsi");
           // this.providers.push(p);
           await Promise.all(
             this.providersTypes.map(async type => {
-              const p = await webConferencing.getProvider(type);
-              this.providers.push(p);
+              try {
+                const p = await webConferencing.getProvider(type);
+                this.providers.push(p);
+              } catch (err) {
+                this.log.error(`Error while getting ${type} provider`, err);
+              }
             })
           );
           await this.initProvidersButton(context);
           this.createButtons();
           this.log.trace("CallButtons are initialized");
         } catch (err) {
-          this.log.error("jitsi error", err);
+          this.log.error("Init buttons error", err);
         }
       }
     },
@@ -131,18 +146,25 @@ export default {
       const thevue = this;
       await Promise.all(
         thevue.providers.map(async p => {
-          if (await p.isInitialized) {
-            const callButton = await p.callButton(this.callContext, "vue");
-            thevue.providersButton.push(callButton);
+          try {
+            if (await p.isInitialized) {
+              const callButton = await p.callButton(this.callContext, "vue");
+              thevue.providersButton.push(callButton);
+              this.log.trace(`Added button for ${p.getType()} provider`);
+            }
+          } catch (err) {
+            this.log.error(`Error while adding ${p.getType()} provider for call button`, err);
           }
         })
       );
+      thevue.log.trace("inited providers button");
     },
     createButtons() {
       if (this.providersButton.length) {
         for (const [index, pb] of this.providersButton.entries()) {
           if (this.providersButton.length > 1) {
-            //add buttons to dropdown coomponent
+            //add buttons to dropdown component
+            this.log.trace("Add buttons to dropdown component");
             if (this.isOpen) {
               ref = this.childRef.callbutton[index];
               // add vue button
@@ -156,6 +178,7 @@ export default {
             }
           } else {
             //add a single button
+            this.log.trace("Add single button");
             const callButton = this.$refs.callbutton;
             callButton.classList.add("single");
             if (pb instanceof Vue) {
@@ -168,6 +191,7 @@ export default {
             }
           }
         }
+        this.log.trace("Created providers button");
       }
     },
     openDropdown() {
@@ -255,13 +279,23 @@ export default {
               }
 
               thevue.localCallContext = callButtonContext;
-              thevue.initButtons(callButtonContext);
+
+              await thevue.initButtons(callButtonContext);
             }
           }
         } else {
           thevue.log.warn("No details provided for Mini-chat room");
         }
       });
+    },
+    cleanProviders() {
+      this.providers.splice(0,this.providers.length);
+    },
+    cleanProvidersButtons() {
+      this.providersButton.splice(0,this.providersButton.length);
+    },
+    cleanProvidersTypes() {
+      this.providersTypes.splice(0,this.providersTypes.length);
     }
   }
 };
@@ -303,6 +337,7 @@ export default {
     left: @width + 40px;
     top: 2px;
     width: @width + 20px;
+    z-index: 777;
     [class^="uiIcon"] {
       font-size: 12px;
     }

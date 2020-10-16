@@ -977,6 +977,9 @@
 		
 		// ******** Context ********
 		var contextInitializer = $.Deferred();
+		this.getContextInitializer = function () {
+			return contextInitializer.promise();
+		};
 
 		var callContextInitializer = $.Deferred();
 
@@ -1077,10 +1080,12 @@
 		};
 
 		var providerConfig = function(type) {
-			for (var i=0; i<providersConfig.length; i++) {
-				var conf = providersConfig[i];
-				if (conf && conf.type == type) {
-					return conf;
+			if (providersConfig) {
+				for (var i=0; i<providersConfig.length; i++) {
+					var conf = providersConfig[i];
+					if (conf && conf.type == type) {
+						return conf;
+					}
 				}
 			}
 			return null;
@@ -1781,7 +1786,7 @@
 			if (currentUser) { 
 				initUsers();
 				initSpacePopups();
-				initSpace();
+				//initSpace();
 				initChat();
 				initMiniChat();
 			}
@@ -2355,7 +2360,6 @@
 
 		this.initSpaceContext = function(spaceId, userId) {
 			clearCallContextInitalizer();
-			currentUser = getUserInfoReq(userId);
 			const context = spaceContext(spaceId);
 			callContextInitializer.resolve(context);
 		};

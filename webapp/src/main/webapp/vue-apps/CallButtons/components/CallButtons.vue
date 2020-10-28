@@ -1,5 +1,5 @@
 <template>
-  <div ref="callbutton" :class="['call-button-container', location]">
+  <div ref="callbutton" :class="['call-button-container', loc]">
     <dropdown
       v-if="providersButton.length > 1"
       :providersbutton="providersButton"
@@ -16,7 +16,7 @@
 
 <script>
 import { store } from "../main.js";
-import { mapState } from "vuex";
+// import { mapState } from "vuex";
 import dropdown from "./Dropdown.vue";
 import singlebtn from "./SingleButton.vue";
 
@@ -40,10 +40,14 @@ export default {
       type: String,
       required: true
     }, 
-    location: {
+    loc: {
       type: String,
       required: true
-    }
+    },
+    st: {
+      type: Object,
+      required: true
+    },
   },
   data() {
     return {
@@ -59,16 +63,20 @@ export default {
   //   placeholder: state => {return state.mini ? "" : "Start call"}
   // })
     callContext() {
-      return store.state.callContext[this.location];
+      // eslint-disable-next-line no-debugger
+      debugger;
+      return this.st.callContext[this.loc];
     },
     placeholder() {
-      return store.state.mini ? "" : "Start call"
+      return this.st.mini ? "" : "Start call"
     },
   }
   ,
   watch: {
     callContext(newContext, oldContext) {
-      // console.log(newContext, oldContext, "NEW OLD");
+      // eslint-disable-next-line no-debugger
+      debugger;
+      console.log(newContext, oldContext, "NEW OLD");
       // if (JSON.stringify(newContext) !== JSON.stringify(oldContext)) {
         this.providersButton = [];
         this.$refs.callbutton.classList.remove("single");

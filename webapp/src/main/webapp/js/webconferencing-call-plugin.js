@@ -1,5 +1,5 @@
 const EVENT_ROOM_SELECTION_CHANGED = "exo-chat-selected-contact-changed";
-let userProfilePopupButton;
+const userProfilePopupButton = [];
 let userProfileButton;
 
 const webconferencingExts = [
@@ -17,7 +17,7 @@ const webconferencingExts = [
     // if it should be custom icon that isn't supported by vuetify iconClass instead of iconName should be used
     iconName: "callButton",
     // appClass is a class of container which consist of action button and WebConferencingCall component
-    appClass: "webconferencingCallButton app",
+    appClass: "call-button call-button--chat",
     // component has property which will be passed to dynamic component inside parent
     // (https://vuejs.org/v2/guide/components.html#Dynamic-Components)
     component: {
@@ -34,7 +34,7 @@ const webconferencingExts = [
       ], function(webConferencing, callButtons) {
         webConferencing.createChatContext(chat).then((context) => {
           // console.log(callButtons.store, "callButtons")
-          callButtons.create(context, target).then((button) => {
+          callButtons.create(context, target, "chatCallButton").then((button) => {
             // context.details().then(contex => console.log(contex, "context"));
             document.addEventListener(EVENT_ROOM_SELECTION_CHANGED, function(target) {
               webConferencing.createChatContext(chat, target).then((contextFromEvent) => {
@@ -62,7 +62,7 @@ const webconferencingExts = [
     // if it should be custom icon that isn't supported by vuetify iconClass instead of iconName should be used
     iconName: "callButton",
     // appClass is a class of container which consist of action button and WebConferencingCall component
-    appClass: "webсonferencingCallButton", // TODO seems here we should add a MINI-class?
+    appClass: "call-button call-button-mini call-button--mini-chat",
     // component has property which will be passed to dynamic component inside parent
     // (https://vuejs.org/v2/guide/components.html#Dynamic-Components)
     component: {
@@ -112,7 +112,7 @@ const webconferencingExts = [
     // if it should be custom icon that isn't supported by vuetify iconClass instead of iconName should be used
     iconName: "callButton",
     // appClass is a class of container which consist of action button and WebConferencingCall component
-    appClass: "webсonferencingCallButton",
+    appClass: "call-button call-button--space",
     // component has property which will be passed to dynamic component inside parent
     // (https://vuejs.org/v2/guide/components.html#Dynamic-Components)
     component: {
@@ -129,8 +129,8 @@ const webconferencingExts = [
       ], function(webConferencing, callButtons) {
         webConferencing.createSpaceContext(spaceId).then((context) => {
           
-          callButtons.create(context, target).then((button) => {
-            button.update(context);  // don't need
+          callButtons.create(context, target, "spaceMenuCallButton").then((button) => {
+            //button.update(context);  // don't need
           });
         });
       });
@@ -148,7 +148,7 @@ const webconferencingExts = [
     key: "userProfilePopupCallButton",
     rank: 23,
     iconName: "callButton",
-    appClass: "webсonferencingCallButton",
+    appClass: "call-button call-button-mini call-button--user-profile-popup",
     component: {
       name: "call-button",
       events: [],
@@ -159,15 +159,12 @@ const webconferencingExts = [
         "SHARED/webConferencing",
         "SHARED/webConferencingCallButton",
       ], function(webConferencing, callButtons) {
-        if (userProfilePopupButton) {
-          // TO DO delete old button
-          //something like userProfilePopupButton.destroy();
-        }
-
+        cleanUserProfilePopupButtons();
         webConferencing.createUserContext(userId).then((context) => {
+          cleanUserProfilePopupButtons();
           callButtons.create(context, target).then((button) => {
-            userProfilePopupButton = button;
-            //button.update(context);  // don't need
+            cleanUserProfilePopupButtons();
+            userProfilePopupButton.push(button);
           });
         });
       });
@@ -185,7 +182,7 @@ const webconferencingExts = [
     key : "userProfileCallButton",
     rank : 24,
     iconName : "callButton",
-    appClass : "webсonferencingCallButton",
+    appClass : "call-button call-button--user-profile",
     component : {
       name : "call-button",
       events : [],
@@ -209,7 +206,7 @@ const webconferencingExts = [
       });
     },
     // enabled just show that this extension is enabled, if enabled: false WebConferencingCallComponent will not appear on page
-    enabled : false,
+    enabled : true,
   }
   /*
   // an example of the extension with DOM elements
@@ -255,3 +252,10 @@ require(["SHARED/extensionRegistry"], function(extensionRegistry) {
     );
   }
 });
+
+
+function cleanUserProfilePopupButtons() {
+  while (userProfilePopupButton.length) {
+    userProfilePopupButton.pop().destroy();
+  }
+}

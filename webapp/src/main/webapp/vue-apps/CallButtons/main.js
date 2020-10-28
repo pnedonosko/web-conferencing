@@ -9,39 +9,25 @@ Vue.use(Vuetify);
 
  export const store = new Vuex.Store({
    state: {
-     callContext: {
-        // "app": {},
-        // "space": {},
-        // "mini": {},
-        // "popup": {},
-        "isUser": {},
-        "isGroup": {},
-     },
+     callContext: {},
      mini: false,
      location: ""
    },
    mutations: {
      initButton(state, payload) {
-       if (state.location === "isUser") {
-        state.callContext.isUser = payload.context
+       if (payload.location) {
+         Vue.set(state, "location", payload.location);
+         Vue.set(state.callContext, payload.location, payload.context);
        }
-       if (state.location === "isGroup") {
-         state.callContext.isGroup = payload.context
-       }
-      //   state.callContext[payload.location] = payload.context;
      },
      toggleMini(state, condition) {
        state.mini = condition ?  true : false;
-     },
-     defineLocation(state, location) {
-      state.location = location ? "isUser" : "isGroup"
      }
    },
    actions: {
    },
  });
-const comp = Vue.component("call-button", callButtons);
-// const comp = Vue.component("call-button", () => import("./components/CallButtons.vue"));
+
 const vuetify = new Vuetify({
   dark: true,
   iconfont: "",
@@ -56,16 +42,12 @@ const url = `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/${loca
 const log = webConferencing.getLog("webconferencing-call-buttons");
 
 export function create(context, target) {
-  this.store.commit("defineLocation", context.isUser)
-  this.store.commit("initButton", {context});
   const result = new Promise((resolve, reject) => {
     if (target) {
+      const location = getLocation(target);
       exoi18n.loadLanguageAsync(lang, url).then((i18n) => {
-        // if (this.store.state.callContext[loc] && JSON.stringify(this.store.state.callContext[loc]) !== JSON.stringify(context)) {
-        // }
         const vmComp = new Vue({
           el: target,
-          store: store,
           render: function(h) {
             return h(
               callButtons,
@@ -74,6 +56,7 @@ export function create(context, target) {
                   i18n,
                   language: lang,
                   resourceBundleName,
+                  location
                 },
               },
               i18n,
@@ -81,12 +64,16 @@ export function create(context, target) {
             );
           },
         });
+        store.commit("initButton", {context, location});
         resolve({
+          thevue: vmComp,
+          loc: location,
           update: function(context) {
-            // Vue.set(vmComp, "loc", context.isUser ? "isUser" : "isGroup")
-            store.commit("defineLocation", context.isUser)
-            store.commit("initButton", {context});
+            store.commit("initButton", {context, location: this.loc});
           },
+          destroy: function() {
+            this.thevue.$destroy();
+          }
         });
         
       });
@@ -97,4 +84,9 @@ export function create(context, target) {
   });
 
   return result;
+}
+
+export function getLocation(target) {
+  const callContainerClasses = target.parentNode.classList;
+  return callContainerClasses.item(callContainerClasses.length - 1);
 }

@@ -3,7 +3,7 @@
     :style="{ 'background-color': header.bgHover }"
     class="dropdown-header"
     @click="showdropdowncomponent(); passrefs()">
-    <div class="dropdown-heading px-2">
+    <div :class="header.arrowPadding" class="dropdown-heading">
       <i class="uiIconSocPhone uiIconSocBlue"></i>
       {{ header.placeholder }}
     </div>
@@ -36,7 +36,6 @@ export default {
 <style scoped lang="less">
 @import "../../../skin/less/variables.less";
 
-.VuetifyApp {
   .dropdown-header {
     display: inline-flex;
     align-items: center;
@@ -60,21 +59,16 @@ export default {
         }
       }
     }
-    
   }
   hr {
     margin: 0;
   }
-}
 .call-button-mini {
   .dropdown-header {
     border: none;
     background: transparent;
     .uiIconMiniArrowDown {
-      position: absolute;
-      top: 11px;
-      right: -7px;
-      text-align: center;
+      margin-bottom: -8px;
       &::before {
         color: @primaryColor;
       }

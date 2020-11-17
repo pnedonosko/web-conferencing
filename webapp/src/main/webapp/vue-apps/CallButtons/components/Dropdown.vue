@@ -62,30 +62,32 @@ export default {
 
 <style scoped lang="less">
 @import "../../../skin/less/variables.less";
-
-.buttons-container {
-  background-color: white;
-  border: @defaultBorder;
-  border-radius: 3px;
-  margin-top: 3px;
-  width: @width + 30px;
-  box-shadow: @defaultShadow;
-  position: absolute;
-  &.left {
-    right: -3px;
-  }
-  &.right {
-    left: 20px;
-  }
-  [class^="call-button-container-"] {
-    padding: 0 10px;
-    height: 36px;
+#dropdown-vue {
+  position: relative;
+  .buttons-container {
+    background-color: white;
+    border: @defaultBorder;
     border-radius: 3px;
-    display: flex;
-    align-items: center;
-    &:hover {
-      background-position: 0 -45px;
-      background-color: @primaryColor;
+    margin-top: 3px;
+    width: @width + 45px;
+    box-shadow: @defaultShadow;
+    position: absolute;
+    &.left {
+      right: -17px;
+    }
+    &.right {
+      left: 0px;
+    }
+    [class^="call-button-container-"] {
+      padding: 0 10px;
+      height: 36px;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      &:hover {
+        background-position: 0 -45px;
+        background-color: @primaryColor;
+      }
     }
   }
 }

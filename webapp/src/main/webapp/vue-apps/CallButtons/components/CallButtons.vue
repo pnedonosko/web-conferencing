@@ -4,13 +4,13 @@
       <dropdown
         v-click-outside="hideDropdown"
         v-if="providersButton.length > 1"
-        :positionclass="positionClass"
+        :positionclass="positionClass()"
         :providersbutton="providersButton"
         :isopen="isOpen"
         :header="header"
         @updated="createButtons"
         @getRefs="getRef($event)"
-        @showDropdown="showDropdown($event)"/>
+        @showDropdown="showDropdown($event)" />
       <singlebtn v-else />
     </div>
   </v-app>
@@ -47,36 +47,52 @@ export default {
       error: null,
       isOpen: false,
       childRef: null,
-      isFirstInitialization: true,
+      isFirstInitialization: true
       // screenWidth: window.innerWidth
     };
   },
   computed: {
-    dropdown: function (x, y) {
-      const el = this.$refs.callbutton && this.$refs.callbutton;
-      return el.getBoundingClientRect().x;
+    dropdown: function() {
+      // const el = this.$refs.callbutton && this.$refs.callbutton;
+      if (this.$refs.callbutton) {
+        return this.$refs.callbutton.getBoundingClientRect().x;
+      } else {
+        return "";
+      }
     },
-    client: function (x, y) {
+    client: function() {
       return document.body.getBoundingClientRect().width;
     },
-    positionClass: function () {
-      return (this.dropdown / this.client < 0.85) ? "right" : "left";
-    },
+    // positionClass: function () {
+    //   return (this.dropdown / this.client < 0.85) ? "right" : "left";
+    // },
     parentClass() {
-      return Object.values(this.$refs.callbutton.parentElement.parentElement.parentElement.classList).join("");
+      return Object.values(
+        this.$refs.callbutton.parentElement.parentElement.parentElement
+          .classList
+      ).join("");
     },
     header() {
       const condition =
         this.parentClass.includes("call-button-mini") ||
         this.parentClass.includes("call-button--tiptip");
       return condition
-        ? { placeholder: "", bgHover: "white", paddingClass: "pa-1", bgMini: this.isOpen ?  "#d3d6db"  : "#ffffff"}
+        ? {
+            placeholder: "",
+            bgHover: "white",
+            paddingClass: "pa-1",
+            arrowPadding: "pl-2",
+            bgMini: this.isOpen ? "#d3d6db" : "#ffffff"
+          }
         : {
             placeholder: this.$i18n.te("webconferencing.callHeader")
               ? this.$i18n.t("webconferencing.callHeader")
               : "Start Call",
-            bgHover: this.isOpen ? "var(--allPagesGreyColor, #e1e8ee)" : "white",
-            paddingClass: "px-2"
+            bgHover: this.isOpen
+              ? "var(--allPagesGreyColor, #e1e8ee)"
+              : "white",
+            paddingClass: "px-2",
+            arrowPadding: "px-2",
           };
     }
   },
@@ -86,7 +102,6 @@ export default {
     }
     // screenWidth(newWidth, oldWidth) {
     //   if (newWidth <= 980) {
-    //     console.log("WIIDTH")
     //     // this.parentClass = this.parentClass + "call-button-mini";
     //   }
     // }
@@ -97,6 +112,12 @@ export default {
   //   });
   // },
   methods: {
+    positionClass: function() {
+      return this.$refs.callbutton.getBoundingClientRect().x / this.client <
+        0.85
+        ? "right"
+        : "left";
+    },
     // onResize() {
     //   this.screenWidth = window.innerWidth;
     // },
@@ -227,7 +248,8 @@ export default {
     }
     a:hover,
     button:hover {
-      i, span {
+      i,
+      span {
         color: white;
       }
     }
@@ -247,7 +269,8 @@ export default {
       }
       &:hover {
         background-color: var(--allPagesGreyColor, #e1e8ee);
-        .single-btn-container, button  {
+        .single-btn-container,
+        button {
           background-color: var(--allPagesGreyColor, #e1e8ee);
         }
 
@@ -274,7 +297,8 @@ export default {
   }
   [class^="call-button-container-"]:hover,
   button:hover {
-    i, span {
+    i,
+    span {
       color: white;
     }
   }
@@ -294,6 +318,7 @@ export default {
     #dropdown-vue {
       .buttons-container {
         // left: -85px;
+        width: @width + 30px;
         [class^="call-button-container-"] {
           button {
             background: transparent;
@@ -346,9 +371,9 @@ export default {
 .call-button-mini.call-button--tiptip {
   .call-button-container {
     #dropdown-vue {
-      position: relative;
+      // position: relative;
       .dropdown-header {
-        position: relative;
+        // position: relative;
         .dropdown-heading {
           [class^="uiIconSoc"] {
             vertical-align: text-top;
@@ -358,49 +383,45 @@ export default {
           }
         }
         .uiIconMiniArrowDown {
-          position: absolute;
-          right: -16px;
           font-size: 8px !important;
           padding: 4px;
-          bottom: -2px;
           border-radius: 50%;
           &::before {
             color: @primaryColor;
           }
         }
       }
-    }
-    .buttons-container {
-      position: absolute;
-      top: 23px;
-      // left: -32px;
-      box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.15);
-      [class^="call-button-container-"] {
-        text-align: left;
-        a,
-        a:hover,
-        a:focus {
-          color: black;
-        }
-        a:hover,
-        button:hover {
-          i, span {
-            color: white;
+      .buttons-container {
+        box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.15);
+        [class^="call-button-container-"] {
+          text-align: left;
+          a,
+          a:hover,
+          a:focus {
+            color: black;
           }
-        }
-        &:hover {
-          i, span {
-            color: white;
+          a:hover,
+          button:hover {
+            i,
+            span {
+              color: white;
+            }
           }
-        }
-        button {
-          padding-left: 0;
-          .logo {
-            margin-bottom: -5px;
+          &:hover {
+            i,
+            span {
+              color: white;
+            }
           }
-          .v-btn__content {
-            [class^="uiIconSoc"] {
-              font-size: 16px !important;
+          button {
+            padding-left: 0;
+            .logo {
+              margin-bottom: -5px;
+            }
+            .v-btn__content {
+              [class^="uiIconSoc"] {
+                font-size: 16px !important;
+              }
             }
           }
         }

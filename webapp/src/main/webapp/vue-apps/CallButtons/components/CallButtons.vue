@@ -1,5 +1,5 @@
 <template>
-  <v-app class="VuetifyApp ma-0">
+  <v-app class="VuetifyApp ma-0 call-button-parent-container">
     <div ref="callbutton" :class="['call-button-container']">
       <dropdown
         v-click-outside="hideDropdown"
@@ -71,7 +71,8 @@ export default {
       isDropdownVisualized: false, // is added to DOM
       childRef: null,
       isFirstInitialization: true,
-      log: null
+      log: null,
+      unique: []
     };
   },
   computed: {
@@ -140,6 +141,12 @@ export default {
   //     window.addEventListener("resize", this.onResize);
   //   });
   // },
+  updated() {
+   this.unique = [...new Set(this.providersButton)];
+   const newarr = this.providersButton.filter((btn, index) => this.providersButton.indexOf(btn) === index);
+   console.log(this.providersButton, this.unique, newarr, "PROVIDERSBUTTONS");
+  //  this.providersButton.filter((button, index) => )
+  },
   methods: {
     // onResize() {
     //   this.screenWidth = window.innerWidth;
@@ -153,24 +160,29 @@ export default {
         if (context && context.details && this.providersButton.length === 0) {
           const callButtons = [];
           context.parentClasses = this.parentClass;
-          webConferencing.getAllProviders().then(providers => {
-            providers.map(provider => {
-              if (provider.isInitialized) {
-                callButtons.push(provider.callButton(context));
-              }
-            });
-            Promise.allSettled(callButtons).then(resCallButtons => {
-              resCallButtons.forEach(button => {
-                if (button.status === "fulfilled") {
-                  this.providersButton.push(button.value);
-                  if (button.value.$data) {
-                    button.value.$data.header = "CALL";
+          //if (this.providersButton.length === 0) {
+            webConferencing.getAllProviders().then(providers => {
+              if (this.providersButton.length === 0) {
+                providers.map(provider => {
+                  if (provider.isInitialized) {
+                    
+                    callButtons.push(provider.callButton(context));
                   }
-                }
+                });
+              }
+              Promise.allSettled(callButtons).then(resCallButtons => {
+                resCallButtons.forEach(button => {
+                  if (button.status === "fulfilled") {
+                    this.providersButton.push(button.value);
+                    if (button.value.$data) {
+                      button.value.$data.header = "CALL";
+                    }
+                  }
+                });
+                thevue.createButtons();
               });
-              thevue.createButtons();
             });
-          });
+          //}
         } else if (context && !context.details) {
           // mini chat - TODO whata a logic for mini chat with context w/o details??
           // TODO Why we need to init if no context or its details?

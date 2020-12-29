@@ -1,5 +1,5 @@
 Vue.config.devtools = true;
-
+const EVENT_ROOM_SELECTION_CHANGED = "exo-chat-selected-contact-changed";
 import CallButtons from "./components/CallButtons.vue";
 Vue.use(Vuetify);
 const vuetify = new Vuetify({
@@ -17,63 +17,80 @@ const log = webConferencing.getLog("webconferencing");
 export function create(context, target) {
   const result = new Promise((resolve, reject) => {
     if (target) {
+      let roomId;
       const mountEl = document.createElement("div"); // div for vue mounting
       // we need the target as the parent container to use that classes for call button settings
       target.appendChild(mountEl);
-
-      exoi18n.loadLanguageAsync(lang, url).then((i18n) => {
-        const comp = new Vue({
-          el: mountEl,
-          components: {
-            CallButtons
-          },
-          data() {
-            return {
-              language: lang,
-              resourceBundleName,
-              callContext: {}
-            }
-          },
-          mounted() {
-            this.setCallContext(context);
-          },
-          methods: {
-            setCallContext(context) {
-              Vue.set(this, "callContext", context);
-            }
-          },
-          i18n,
-          vuetify,
-          render: function(h) {
-            return h(CallButtons, {
-              props: {
-                language: lang,
-                resourceBundleName,
-                callContext: this.callContext,
+      const parentCallButtonContainer = document.querySelector(".call-button-parent-container");
+      document.addEventListener(EVENT_ROOM_SELECTION_CHANGED, e => {
+        console.log(roomId, e.detail.room, "ROOOOOM");
+        if (e.detail.room !== roomId) {
+          roomId = e.detail.room;
+          exoi18n.loadLanguageAsync(lang, url).then((i18n) => {
+            const comp = new Vue({
+              el: mountEl,
+              components: {
+                CallButtons
               },
-              on: {
-                created: function() {
-                  resolve({
-                    vm: comp,
-                    update: function(context) {
-                      const targetId = context.isUser ? context.userId : context.isSpace ? context.spaceId : context.isRoom ? context.roomName : null;
-                      if (targetId) {
-                        log.trace(">> update target: " + targetId);
-                      } else {
-                        log.trace(">> update >> cannot find target from context: " + JSON.stringify(context));
-                      }
-                      comp.setCallContext(context);
-                    },
-                    getElement: function() {
-                      return this.vm.$el;
-                    }
-                  });
+              data() {
+                return {
+                  language: lang,
+                  resourceBundleName,
+                  callContext: {}
                 }
+              },
+              mounted() {
+                this.setCallContext(context);
+              },
+              methods: {
+                setCallContext(context) {
+                  Vue.set(this, "callContext", context);
+                }
+              },
+              i18n,
+              vuetify,
+              render: function(h) {
+                return h(CallButtons, {
+                  props: {
+                    language: lang,
+                    resourceBundleName,
+                    callContext: this.callContext,
+                  },
+                  on: {
+                    created: function() {
+                      resolve({
+                        vm: comp,
+                        update: function(context) {
+                          const targetId = context.isUser ? context.userId : context.isSpace ? context.spaceId : context.isRoom ? context.roomName : null;
+                          if (targetId) {
+                            log.trace(">> update target: " + targetId);
+                          } else {
+                            log.trace(">> update >> cannot find target from context: " + JSON.stringify(context));
+                          }
+                          comp.setCallContext(context);
+                        },
+                        getElement: function() {
+                          return this.vm.$el;
+                        }
+                      });
+                    }
+                  }
+                });
               }
             });
-          }
-        });
-      });
+            
+            // document.addEventListener(EVENT_ROOM_SELECTION_CHANGED, e => {
+            //   console.log(target);
+            //   console.log("SELECTION CHANGED",e);
+              // target.removeChild(parentCallButtonContainer);
+              // target.appendChild(parentCallButtonContainer);
+            //   // comp.$destroy();
+            // })
+          });
+        }
+      })
+      
+
     } else {
       const log = webConferencing.getLog("webconferencing");
       log.error("Error getting the extension container");
